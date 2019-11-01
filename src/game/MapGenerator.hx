@@ -54,34 +54,32 @@ class MapGenerator {
         var h = 64;
         var rects = new Array<Rectangle>();
         var map = new Map(w, h);
+        var mapRect = new Rectangle(0, 0, w, h);
         var lastType:Tile = Corridor;
-        var lastRectangle:Rectangle;
+        var lastRectangle:Rectangle = null;
 
         while(rects.length < 8) {
             var r = Std.random(2);
+            var rect:Rectangle = null;
+            var type:Tile = null;
             lastRectangle = rects[rects.length - 1];
 
-            switch(r) {
-                case 0: {
-                    var rect = getRandomRectangle(map, 48, 48);
+            if(lastType == Corridor) {
+                rect = getRandomRectangle(map, 48, 48);
+                type = Room;
+            } else {
+                if(lastRectangle != null) {
+                    rect = getRandomCorridor(map, lastRectangle);
+                    type = Corridor;
+                }
+            }
 
+            if(rect != null) {
+                if(untyped Phaser.Geom.Rectangle.ContainsRect(mapRect, rect)) {
                     if(!collides(rect, rects)) {
                         map.fillTiles(rect, Room);
                         rects.push(rect);
-                    }
-                }
-
-                case 1: {
-                    var r2:Bool = Std.random(2) == 0;
-                    var rect = getRandomRectangle(map, r2 ? 4 : 48, r2 ? 48:4);
-
-                    if(lastRectangle != null) {
-                        var c = untyped Phaser.Geom.Intersects.RectangleToRectangle(rect, lastRectangle);
-
-                        if(c) {
-                            map.fillTiles(rect, Room);
-                            rects.push(rect);
-                        }
+                        lastType = type;
                     }
                 }
             }
@@ -97,18 +95,44 @@ class MapGenerator {
     static private inline function getRandomRectangle(map, maxWidth, maxHeight):Rectangle {
         var x = Std.random(map.width - 2);
         var y = Std.random(map.height - 2);
-        var w = Std.random(cast Math.min(maxWidth, map.width - x));
-        var h = Std.random(cast Math.min(maxHeight, map.height - y));
+        var w = getRandomInt(8, maxWidth);
+        var h = getRandomInt(8, maxHeight);
         var rect = new Rectangle(x, y, w, h);
         return rect;
     }
 
     static private inline function getRandomCorridor(map, parent:Rectangle) {
         var r = Std.random(2);
+        var r2 = Std.random(2);
+        var x:Int;
+        var y:Int;
+        var w:Int;
+        var h:Int;
 
         if(r==0) {
+            x = getRandomInt(cast parent.left, cast parent.right);
+            w = getRandomInt(2, 4);
+            h = getRandomInt(8, 36);
+
+            if(r2==0) {
+                y = cast parent.top - h - 1;
+            } else {
+                y = cast parent.bottom + 1;
+            }
         } else {
+            y = getRandomInt(cast parent.top, cast parent.bottom);
+            h = getRandomInt(2, 4);
+            w = getRandomInt(8, 36);
+
+            if(r2==0) {
+                x = cast parent.left - w - 1;
+            } else {
+                x = cast parent.right + 1;
+            }
         }
+
+        var rect = new Rectangle(x, y, w, h);
+        return rect;
     }
 
 
@@ -121,4 +145,5 @@ class MapGenerator {
 
         return false;
     }
+
 }
