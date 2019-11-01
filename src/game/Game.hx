@@ -70,6 +70,12 @@ class Game extends Application {
                             e.get(Sprite).tint = 0xff0000;
                         }
 
+                        case Corridor: {
+                            e = Factory.createTile();
+                            engine.addEntity(e);
+                            e.get(Sprite).tint = 0x0000ff;
+                        }
+
                         case Room: {
                             e = Factory.createTile();
                             engine.addEntity(e);
