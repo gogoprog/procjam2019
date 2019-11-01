@@ -12,6 +12,7 @@ class Factory {
         var e = new Entity();
         e.add(new Sprite("square"));
         e.add(new Transform());
+        e.get(Transform).scale.setTo(0.5, 0.5);
         return e;
     }
 }
