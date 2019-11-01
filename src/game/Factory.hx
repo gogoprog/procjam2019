@@ -12,7 +12,8 @@ class Factory {
         var e = new Entity();
         e.add(new Sprite("square"));
         e.add(new Transform());
-        e.get(Transform).scale.setTo(0.5, 0.5);
+        var s = Config.tileSize / e.get(Sprite).displayWidth;
+        e.get(Transform).scale.setTo(s, s);
         return e;
     }
 }

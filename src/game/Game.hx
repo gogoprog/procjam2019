@@ -34,13 +34,25 @@ class Game extends Application {
         AudioManager.init(whiplash.Lib.phaserScene);
 
 
+        generateMap();
+    }
+
+    override function onGuiLoaded():Void {
+        super.onGuiLoaded();
+
+        new JQuery("input").click(function(e) {
+            generateMap();
+        });
+    }
+
+    public function generateMap() {
         var map  = mapGen.generate();
         drawMap(map);
-
     }
 
     public function drawMap(map) {
         engine.removeAllEntities();
+        var offset = Config.gridOffset;
 
         for(y in 0...map.height) {
             for(x in 0...map.width) {
@@ -66,7 +78,7 @@ class Game extends Application {
                 }
 
                 if(e!=null) {
-                    e.get(Transform).position.setTo(16*x, 16*y);
+                    e.get(Transform).position.setTo(offset.x + Config.tileSize*x, offset.y + Config.tileSize*y);
                 }
             }
         }

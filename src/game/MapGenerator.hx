@@ -1,5 +1,7 @@
 package game;
 
+import phaser.geom.Rectangle;
+
 enum Tile {
     Empty;
     Room;
@@ -21,12 +23,24 @@ class Map {
         }
     }
 
-    public function setTile(x:Int, y:Int, t:Tile) {
+    public inline function setTile(x:Int, y:Int, t:Tile) {
         grid[y][x] = t;
     }
-    public function getTile(x:Int, y:Int):Tile {
+    public inline function getTile(x:Int, y:Int):Tile {
         return grid[y][x];
     }
+
+    public function fillTiles(rect:Rectangle, t:Tile) {
+        var sx = Std.int(rect.x);
+        var sy = Std.int(rect.y);
+
+        for(y in 0...Std.int(rect.height)) {
+            for(x in 0...Std.int(rect.width)) {
+                setTile(sx+x, sy+y, t);
+            }
+        }
+    }
+
 }
 
 class MapGenerator {
@@ -35,11 +49,26 @@ class MapGenerator {
     }
 
     public function generate():Map {
-        var map = new Map(128, 64);
-        map.setTile(30, 30, Door);
-        map.setTile(30, 29, Door);
-        map.setTile(1, 1, Room);
+        var w = 128;
+        var h = 64;
+        var rects = new Array<Rectangle>();
+        var map = new Map(w, h);
+
+        for(i in 0...4) {
+            var rect = getRandomRectangle(map);
+            map.fillTiles(rect, Room);
+            trace(rect);
+        }
 
         return map;
+    }
+
+    static private inline function getRandomRectangle(map):Rectangle {
+        var x = Std.random(map.width - 2);
+        var y = Std.random(map.height - 2);
+        var w = Std.random(map.width - x);
+        var h = Std.random(map.height - y);
+        var rect = new Rectangle(x, y, w, h);
+        return rect;
     }
 }
