@@ -1,0 +1,3 @@
+[submodule "deps/whiplash"]
+	path = deps/whiplash
+	url = https://github.com/firefalcom/whiplash.git

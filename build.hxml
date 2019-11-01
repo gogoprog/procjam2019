@@ -1,0 +1,12 @@
+-cp src
+-cp deps/whiplash/src
+-cp deps/whiplash/deps/haxe-babylon/src
+-cp deps/whiplash/deps/haxe-phaser3/src
+-cp deps/whiplash/deps/Ash-Haxe/src
+-cp deps/whiplash/deps/jquery-uipages/src
+-js build/generated.js
+-main game.Game
+-D phaser
+-D dataPath=./data
+-D dataRelativePath=../data
+
