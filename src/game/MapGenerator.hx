@@ -135,26 +135,38 @@ class MapGenerator {
         map.walls = [];
 
         for(rect in map.rects) {
-            var wall = new Wall();
-            var x:Int = cast rect.x;
-            var y:Int = cast rect.y;
-            wall.x1 = x;
-            wall.y1 = y;
-            wall.x2 = wall.x1;
-            wall.y2 = wall.y1;
+            var wall:Wall = null;
+            var x:Int;
+            var y:Int;
+            function validateWall() {
+                if(wall != null) {
+                    if(wall.x1 != wall.x2 || wall.y1 != wall.y2) {
+                        map.walls.push(wall);
+                    }
 
-            for(i in 0...cast rect.width) {
-                x = cast rect.x + i;
-
-                if(map.getTile(x, y - 1) == null) {
-                    wall.x2 += 1;
-                } else {
-                    map.walls.push(wall);
-                    wall = new Wall(x + 1, y, x + 1, y);
+                    wall = null;
                 }
             }
+            {
+                x = cast rect.x;
+                y = cast rect.y;
 
-            map.walls.push(wall);
+                for(i in 0...cast rect.width) {
+                    x = cast rect.x + i;
+
+                    if(wall == null) {
+                        wall = new Wall(x, y, x, y);
+                    }
+
+                    if(map.getTile(x, y - 1) == null) {
+                        wall.x2 += 1;
+                    } else {
+                        validateWall();
+                    }
+                }
+
+                validateWall();
+            }
         }
     }
 
