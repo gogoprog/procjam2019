@@ -147,22 +147,58 @@ class MapGenerator {
                     wall = null;
                 }
             }
+            function process(checkx, checky, dx, dy) {
+                if(wall == null) {
+                    wall = new Wall(x, y, x, y);
+                }
+
+                if(map.getTile(x + checkx, y + checky) == null) {
+                    wall.x2 += dx;
+                    wall.y2 += dy;
+                } else {
+                    validateWall();
+                }
+            }
             {
                 x = cast rect.x;
                 y = cast rect.y;
 
                 for(i in 0...cast rect.width) {
                     x = cast rect.x + i;
+                    process(0, -1, 1, 0);
+                }
 
-                    if(wall == null) {
-                        wall = new Wall(x, y, x, y);
-                    }
+                validateWall();
+            }
+            {
+                x = cast rect.x;
+                y = cast rect.bottom;
 
-                    if(map.getTile(x, y - 1) == null) {
-                        wall.x2 += 1;
-                    } else {
-                        validateWall();
-                    }
+                for(i in 0...cast rect.width) {
+                    x = cast rect.x + i;
+                    process(0, 0, 1, 0);
+                }
+
+                validateWall();
+            }
+            {
+                x = cast rect.x;
+                y = cast rect.y;
+
+                for(i in 0...cast rect.height) {
+                    y = cast rect.y + i;
+                    process(-1, 0, 0, 1);
+                }
+
+                validateWall();
+            }
+            {
+                x = cast rect.right;
+                y = cast rect.y;
+
+                for(i in 0...cast rect.height) {
+                    y = cast rect.y + i;
+                    process(0, 0, 0, 1);
                 }
 
                 validateWall();
