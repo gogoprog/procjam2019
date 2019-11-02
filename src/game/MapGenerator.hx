@@ -13,15 +13,20 @@ class Map {
     public var grid:Array<Array<Tile>>;
     public var width:Int;
     public var height:Int;
+    public var rect:Rectangle;
+    public var rects:Array<Rectangle>;
 
     public function new(w, h) {
         this.width = w;
         this.height = h;
+        this.rect = new Rectangle(0, 0, w, h);
         grid = new Array<Array<Tile>>();
 
         for(y in 0...height) {
             grid[y] = new Array<Tile>();
         }
+
+        rects = [];
     }
 
     public inline function setTile(x:Int, y:Int, t:Tile) {
@@ -31,7 +36,7 @@ class Map {
         return grid[y][x];
     }
 
-    public function fillTiles(rect:Rectangle, t:Tile) {
+    public function addRect(rect:Rectangle, t:Tile) {
         var sx = Std.int(rect.x);
         var sy = Std.int(rect.y);
 
@@ -40,6 +45,12 @@ class Map {
                 setTile(sx+x, sy+y, t);
             }
         }
+
+        rects.push(rect);
+    }
+
+    public function getLastRect():Rectangle {
+        return rects[rects.length-1];
     }
 
 }
@@ -52,40 +63,48 @@ class MapGenerator {
     public function generate():Map {
         var w = 128;
         var h = 64;
-        var rects = new Array<Rectangle>();
         var map = new Map(w, h);
-        var mapRect = new Rectangle(0, 0, w, h);
-        var lastType:Tile = Corridor;
-        var lastRectangle:Rectangle = null;
 
-        while(rects.length < 8) {
-            var r = Std.random(2);
-            var rect:Rectangle = null;
-            var type:Tile = null;
-            lastRectangle = rects[rects.length - 1];
+        var rect = getRandomRectangle(map, 32, 32);
+        map.addRect(rect, Room);
 
-            if(lastType == Corridor) {
-                rect = getRandomRectangle(map, 48, 48);
-                type = Room;
-            } else {
-                if(lastRectangle != null) {
-                    rect = getRandomCorridor(map, lastRectangle);
-                    type = Corridor;
-                }
-            }
-
-            if(rect != null) {
-                if(untyped Phaser.Geom.Rectangle.ContainsRect(mapRect, rect)) {
-                    if(!collides(rect, rects)) {
-                        map.fillTiles(rect, Room);
-                        rects.push(rect);
-                        lastType = type;
-                    }
-                }
-            }
+        while(map.rects.length < 4) {
+            step(map);
         }
 
         return map;
+    }
+
+    public function step(map) {
+        var r = Std.random(2);
+        var rect:Rectangle = null;
+        var added = false;
+        var count = 0;
+
+        if(r == 0) {
+            while(!added && count < 128) {
+                rect = getRandomRoom(map, map.getLastRect());
+                added = tryAdd(map, rect);
+                ++count;
+            }
+        } else {
+            while(!added && count < 128) {
+                rect = getRandomCorridor(map, map.getLastRect());
+                added = tryAdd(map, rect);
+                ++count;
+            }
+        }
+    }
+
+    static private function tryAdd(map, rect) {
+        if(untyped Phaser.Geom.Rectangle.ContainsRect(map.rect, rect)) {
+            if(!isValid(rect, map.getLastRect(), map.rects)) {
+                map.addRect(rect, Room);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static private function getRandomInt(min, max):Int {
@@ -111,23 +130,23 @@ class MapGenerator {
 
         if(r==0) {
             x = getRandomInt(cast parent.left, cast parent.right);
-            w = getRandomInt(2, 4);
-            h = getRandomInt(8, 36);
+            w = getRandomInt(1, 4);
+            h = getRandomInt(6, 36);
 
             if(r2==0) {
-                y = cast parent.top - h - 1;
+                y = cast parent.top - h;
             } else {
-                y = cast parent.bottom + 1;
+                y = cast parent.bottom;
             }
         } else {
             y = getRandomInt(cast parent.top, cast parent.bottom);
-            h = getRandomInt(2, 4);
-            w = getRandomInt(8, 36);
+            h = getRandomInt(1, 4);
+            w = getRandomInt(6, 36);
 
             if(r2==0) {
-                x = cast parent.left - w - 1;
+                x = cast parent.left - w;
             } else {
-                x = cast parent.right + 1;
+                x = cast parent.right;
             }
         }
 
@@ -136,9 +155,40 @@ class MapGenerator {
     }
 
 
+    static private inline function getRandomRoom(map, parent:Rectangle) {
+        var r = Std.random(2);
+        var x:Int;
+        var y:Int;
+        var w:Int;
+        var h:Int;
+        w = getRandomInt(6, 32);
+        h = getRandomInt(6, 32);
+
+        if(parent.width < parent.height) {
+            x = Std.int(parent.x) - getRandomInt(0, w - Std.int(parent.width));
+
+            if(r==0) {
+                y = cast parent.y - h;
+            } else {
+                y = cast parent.bottom;
+            }
+        } else {
+            y = Std.int(parent.y) - getRandomInt(0, h - Std.int(parent.height));
+
+            if(r==0) {
+                x = cast parent.x - w;
+            } else {
+                x = cast parent.bottom;
+            }
+        }
+
+        var rect = new Rectangle(x, y, w, h);
+        return rect;
+    }
+
     static private function collides(rect:Rectangle, rects:Array<Rectangle>):Bool {
         for(other_rect in rects) {
-            if(untyped Phaser.Geom.Intersects.RectangleToRectangle(rect, other_rect)) {
+            if(intersects(rect, other_rect)) {
                 return true;
             }
         }
@@ -146,4 +196,25 @@ class MapGenerator {
         return false;
     }
 
+    static private function isValid(rect:Rectangle, parent:Rectangle, rects:Array<Rectangle>):Bool {
+        for(other_rect in rects) {
+            if(other_rect != parent) {
+                if(intersectsOrTouches(rect, other_rect)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    static private function intersects(rectA:Rectangle, rectB:Rectangle) {
+        return !(rectA.right <= rectB.x || rectA.bottom <= rectB.y || rectA.x >= rectB.right || rectA.y >= rectB.bottom);
+    }
+
+
+    static private function intersectsOrTouches(rectA:Rectangle, rectB:Rectangle) {
+        return !(rectA.right < rectB.x || rectA.bottom < rectB.y || rectA.x > rectB.right || rectA.y > rectB.bottom);
+    }
 }

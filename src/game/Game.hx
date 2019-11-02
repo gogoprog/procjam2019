@@ -16,8 +16,8 @@ import whiplash.common.components.Active;
 import game.MapGenerator;
 
 class Game extends Application {
-
     private var mapGen:MapGenerator = new MapGenerator();
+    private var currentMap:Map;
 
     public function new() {
         super(1024, 600, ".root");
@@ -40,14 +40,19 @@ class Game extends Application {
     override function onGuiLoaded():Void {
         super.onGuiLoaded();
 
-        new JQuery("input").click(function(e) {
+        new JQuery(".gen").click(function(e) {
             generateMap();
+        });
+        new JQuery(".step").click(function(e) {
+            mapGen.step(currentMap);
+            drawMap(currentMap);
         });
     }
 
     public function generateMap() {
         var map  = mapGen.generate();
         drawMap(map);
+        currentMap = map;
     }
 
     public function drawMap(map) {
