@@ -144,12 +144,13 @@ class MapGenerator {
             wall.y2 = wall.y1;
 
             for(i in 0...cast rect.width) {
-                x += i;
+                x = cast rect.x + i;
 
                 if(map.getTile(x, y - 1) == null) {
                     wall.x2 += 1;
                 } else {
                     map.walls.push(wall);
+                    wall = new Wall(x + 1, y, x + 1, y);
                 }
             }
 
