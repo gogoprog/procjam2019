@@ -4,6 +4,7 @@ import phaser.geom.Rectangle;
 
 enum Tile {
     Empty;
+    First;
     Room;
     Door;
     Corridor;
@@ -65,41 +66,58 @@ class MapGenerator {
         var h = 64;
         var map = new Map(w, h);
 
-        var rect = getRandomRectangle(map, 32, 32);
-        map.addRect(rect, Room);
+        while(map.rects.length < 1) {
+            var rect = getRandomRectangle(map, 32, 32);
+            tryAdd(map, rect, First);
+        }
 
-        while(map.rects.length < 4) {
-            step(map);
+        while(step(map)) {
+        }
+
+        for(i in 0...8) {
+            var startRectangle = map.rects[Std.random(map.rects.length)];
+            var started = step(map, startRectangle);
+
+            if(started) {
+                while(step(map)) {
+                }
+            }
         }
 
         return map;
     }
 
-    public function step(map) {
+    public function step(map, lastRectangle:Rectangle = null) {
         var r = Std.random(2);
         var rect:Rectangle = null;
         var added = false;
         var count = 0;
 
+        if(lastRectangle == null) {
+            lastRectangle = map.getLastRect();
+        }
+
         if(r == 0) {
-            while(!added && count < 128) {
-                rect = getRandomRoom(map, map.getLastRect());
-                added = tryAdd(map, rect);
+            while(!added && count < 1024) {
+                rect = getRandomRoom(map, lastRectangle);
+                added = tryAdd(map, rect, Room);
                 ++count;
             }
         } else {
-            while(!added && count < 128) {
-                rect = getRandomCorridor(map, map.getLastRect());
-                added = tryAdd(map, rect);
+            while(!added && count < 1024) {
+                rect = getRandomCorridor(map, lastRectangle);
+                added = tryAdd(map, rect, Corridor);
                 ++count;
             }
         }
+
+        return added;
     }
 
-    static private function tryAdd(map, rect) {
+    static private function tryAdd(map, rect, tile:Tile) {
         if(untyped Phaser.Geom.Rectangle.ContainsRect(map.rect, rect)) {
             if(!isValid(rect, map.getLastRect(), map.rects)) {
-                map.addRect(rect, Room);
+                map.addRect(rect, tile);
                 return true;
             }
         }
@@ -178,7 +196,7 @@ class MapGenerator {
             if(r==0) {
                 x = cast parent.x - w;
             } else {
-                x = cast parent.bottom;
+                x = cast parent.right;
             }
         }
 

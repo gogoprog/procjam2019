@@ -69,6 +69,12 @@ class Game extends Application {
                         case Empty: {
                         }
 
+                        case First: {
+                            e = Factory.createTile();
+                            engine.addEntity(e);
+                            e.get(Sprite).tint = 0x00ff00;
+                        }
+
                         case Door: {
                             e = Factory.createTile();
                             engine.addEntity(e);
@@ -78,7 +84,7 @@ class Game extends Application {
                         case Corridor: {
                             e = Factory.createTile();
                             engine.addEntity(e);
-                            e.get(Sprite).tint = 0x0000ff;
+                            e.get(Sprite).tint = 0xffff00;
                         }
 
                         case Room: {
