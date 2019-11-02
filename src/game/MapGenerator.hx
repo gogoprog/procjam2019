@@ -68,7 +68,7 @@ class MapGenerator {
 
         while(map.rects.length < 1) {
             var rect = getRandomRectangle(map, 32, 32);
-            tryAdd(map, rect, First);
+            tryAdd(map, rect, null, First);
         }
 
         while(step(map)) {
@@ -100,13 +100,13 @@ class MapGenerator {
         if(r == 0) {
             while(!added && count < 1024) {
                 rect = getRandomRoom(map, lastRectangle);
-                added = tryAdd(map, rect, Room);
+                added = tryAdd(map, rect, lastRectangle, Room);
                 ++count;
             }
         } else {
             while(!added && count < 1024) {
                 rect = getRandomCorridor(map, lastRectangle);
-                added = tryAdd(map, rect, Corridor);
+                added = tryAdd(map, rect, lastRectangle, Corridor);
                 ++count;
             }
         }
@@ -114,9 +114,9 @@ class MapGenerator {
         return added;
     }
 
-    static private function tryAdd(map, rect, tile:Tile) {
+    static private function tryAdd(map, rect, parent, tile:Tile) {
         if(untyped Phaser.Geom.Rectangle.ContainsRect(map.rect, rect)) {
-            if(!isValid(rect, map.getLastRect(), map.rects)) {
+            if(!isValid(rect, parent, map.rects)) {
                 map.addRect(rect, tile);
                 return true;
             }
@@ -126,7 +126,7 @@ class MapGenerator {
     }
 
     static private function getRandomInt(min, max):Int {
-        return min + Std.random(max - min);
+        return min + Std.random(max - min + 1);
     }
 
     static private inline function getRandomRectangle(map, maxWidth, maxHeight):Rectangle {
@@ -147,8 +147,8 @@ class MapGenerator {
         var h:Int;
 
         if(r==0) {
-            x = getRandomInt(cast parent.left, cast parent.right);
             w = getRandomInt(1, 4);
+            x = getRandomInt(cast parent.left, cast parent.right - w);
             h = getRandomInt(6, 36);
 
             if(r2==0) {
@@ -157,8 +157,8 @@ class MapGenerator {
                 y = cast parent.bottom;
             }
         } else {
-            y = getRandomInt(cast parent.top, cast parent.bottom);
             h = getRandomInt(1, 4);
+            y = getRandomInt(cast parent.top, cast parent.bottom - h);
             w = getRandomInt(6, 36);
 
             if(r2==0) {
