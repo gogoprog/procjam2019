@@ -16,4 +16,11 @@ class Factory {
         e.get(Transform).scale.setTo(s, s);
         return e;
     }
+
+    static public function createGraphics() {
+        var e = new Entity();
+        e.add(new Transform());
+        e.add(new Graphics());
+        return e;
+    }
 }

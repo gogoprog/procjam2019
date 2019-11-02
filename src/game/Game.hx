@@ -99,6 +99,16 @@ class Game extends Application {
                 }
             }
         }
+
+        {
+            var e = Factory.createGraphics();
+            engine.addEntity(e);
+            var g = e.get(Graphics);
+
+            // for(wall in map.walls) {
+                // g.lineBetween(wall.x1, wall.y1, wall.x2, wall.y2);
+            // }
+        }
     }
 
     static function main():Void {

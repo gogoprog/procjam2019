@@ -1,6 +1,7 @@
 package game;
 
 import phaser.geom.Rectangle;
+import whiplash.math.Vector2;
 
 enum Tile {
     Empty;
@@ -10,12 +11,21 @@ enum Tile {
     Corridor;
 }
 
+class Wall extends phaser.geom.Line {
+
+    public function new(a, b, c, d) {
+        super(a, b, c, d);
+    }
+
+}
+
 class Map {
     public var grid:Array<Array<Tile>>;
     public var width:Int;
     public var height:Int;
     public var rect:Rectangle;
     public var rects:Array<Rectangle>;
+    public var walls:Array<Wall>;
 
     public function new(w, h) {
         this.width = w;
@@ -67,7 +77,7 @@ class MapGenerator {
         var map = new Map(w, h);
 
         while(map.rects.length < 1) {
-            var rect = getRandomRectangle(map, 32, 32);
+            var rect = getRandomRectangle(map, 20, 20);
             tryAdd(map, rect, null, First);
         }
 
@@ -83,6 +93,8 @@ class MapGenerator {
                 }
             }
         }
+
+        computeWalls(map);
 
         return map;
     }
@@ -112,6 +124,23 @@ class MapGenerator {
         }
 
         return added;
+    }
+
+    public function computeWalls(map:Map) {
+        map.walls = [];
+
+        for(rect in map.rects) {
+            var begin = new Vector2();
+            var end = new Vector2();
+            begin.x = rect.x - Config.halfTileSize;
+            end.x = begin.x;
+
+            for(x in 0...cast rect.width) {
+                end.x += Config.tileSize;
+            }
+
+            map.walls.push(new Wall(begin.x, begin.y, end.x, end.y));
+        }
     }
 
     static private function tryAdd(map, rect, parent, tile:Tile) {
@@ -147,7 +176,7 @@ class MapGenerator {
         var h:Int;
 
         if(r==0) {
-            w = getRandomInt(1, 4);
+            w = getRandomInt(1, Std.int(Math.min(4, parent.width)));
             x = getRandomInt(cast parent.left, cast parent.right - w);
             h = getRandomInt(6, 36);
 
@@ -157,7 +186,7 @@ class MapGenerator {
                 y = cast parent.bottom;
             }
         } else {
-            h = getRandomInt(1, 4);
+            h = getRandomInt(1, Std.int(Math.min(4, parent.height)));
             y = getRandomInt(cast parent.top, cast parent.bottom - h);
             w = getRandomInt(6, 36);
 
