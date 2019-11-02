@@ -66,9 +66,6 @@ class Game extends Application {
 
                 if(t != null) {
                     switch(t) {
-                        case Empty: {
-                        }
-
                         case First: {
                             e = Factory.createTile();
                             engine.addEntity(e);
@@ -104,10 +101,11 @@ class Game extends Application {
             var e = Factory.createGraphics();
             engine.addEntity(e);
             var g = e.get(Graphics);
+            var walls:Array<Wall> = map.walls;
 
-            // for(wall in map.walls) {
-                // g.lineBetween(wall.x1, wall.y1, wall.x2, wall.y2);
-            // }
+            for(wall in walls) {
+                g.lineBetween(wall.x1 * Config.tileSize, wall.y1 * Config.tileSize, wall.x2 * Config.tileSize, wall.y2 * Config.tileSize);
+            }
         }
     }
 

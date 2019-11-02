@@ -4,7 +4,6 @@ import phaser.geom.Rectangle;
 import whiplash.math.Vector2;
 
 enum Tile {
-    Empty;
     First;
     Room;
     Door;
@@ -13,7 +12,7 @@ enum Tile {
 
 class Wall extends phaser.geom.Line {
 
-    public function new(a, b, c, d) {
+    public function new(?a, ?b, ?c, ?d) {
         super(a, b, c, d);
     }
 
@@ -43,8 +42,14 @@ class Map {
     public inline function setTile(x:Int, y:Int, t:Tile) {
         grid[y][x] = t;
     }
+
     public inline function getTile(x:Int, y:Int):Tile {
-        return grid[y][x];
+        if(grid[y] != null) {
+            var v = grid[y][x];
+            return v;
+        }
+
+        return null;
     }
 
     public function addRect(rect:Rectangle, t:Tile) {
@@ -130,16 +135,25 @@ class MapGenerator {
         map.walls = [];
 
         for(rect in map.rects) {
-            var begin = new Vector2();
-            var end = new Vector2();
-            begin.x = rect.x - Config.halfTileSize;
-            end.x = begin.x;
+            var wall = new Wall();
+            var x:Int = cast rect.x;
+            var y:Int = cast rect.y;
+            wall.x1 = x;
+            wall.y1 = y;
+            wall.x2 = wall.x1;
+            wall.y2 = wall.y1;
 
-            for(x in 0...cast rect.width) {
-                end.x += Config.tileSize;
+            for(i in 0...cast rect.width) {
+                x += i;
+
+                if(map.getTile(x, y - 1) == null) {
+                    wall.x2 += 1;
+                } else {
+                    map.walls.push(wall);
+                }
             }
 
-            map.walls.push(new Wall(begin.x, begin.y, end.x, end.y));
+            map.walls.push(wall);
         }
     }
 
