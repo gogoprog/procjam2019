@@ -52,49 +52,30 @@ class Game extends Application {
 
     public function drawMap(map:game.map.Map) {
         engine.removeAllEntities();
-        var offset = Config.gridOffset;
-
-        for(y in 0...map.height) {
-            for(x in 0...map.width) {
-                var t = map.getTile(x, y);
-                var e:Entity = null;
-
-                if(t != null) {
-                    switch(t) {
-                        case First: {
-                            e = Factory.createTile();
-                            engine.addEntity(e);
-                            e.get(Sprite).tint = 0xaaffaa;
-                        }
-
-                        case Door: {
-                            e = Factory.createTile();
-                            engine.addEntity(e);
-                            e.get(Sprite).tint = 0xffaaaa;
-                        }
-
-                        case Room: {
-                            e = Factory.createTile();
-                            engine.addEntity(e);
-                            e.get(Sprite).tint = 0xffffaa;
-                        }
-                    }
-                }
-
-                if(e!=null) {
-                    e.get(Transform).position.setTo(offset.x + Config.tileSize*x, offset.y + Config.tileSize*y);
-                }
-            }
-        }
-
         {
             var e = Factory.createGraphics();
             engine.addEntity(e);
             var g = e.get(Graphics);
+            var s = Config.tileSize;
             var walls:Array<game.map.Wall> = map.walls;
 
+            for(zone in map.allZones) {
+                switch(zone.type) {
+                    case First:
+                        g.fillStyle(0xaaffaa, 1);
+
+                    case Room:
+                        g.fillStyle(0xffffaa, 1);
+
+                    case Door:
+                        g.fillStyle(0xffaaaa, 1);
+                }
+
+                g.fillRect(zone.rect.x * s, zone.rect.y * s, zone.rect.width *s, zone.rect.height * s);
+            }
+
             for(wall in walls) {
-                g.lineBetween(wall.x1 * Config.tileSize, wall.y1 * Config.tileSize, wall.x2 * Config.tileSize, wall.y2 * Config.tileSize);
+                g.lineBetween(wall.x1 * s, wall.y1 * s, wall.x2 * s, wall.y2 * s);
             }
         }
     }
