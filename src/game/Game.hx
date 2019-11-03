@@ -54,12 +54,6 @@ class Game extends Application {
         entity.add(new Transform3d());
         entity.get(Transform3d).position = new BABYLON.Vector3(0, 100, -100);
         engine.addEntity(entity);
-        {
-            var entity = new Entity();
-            entity.add(new Mesh(BABYLON.Mesh.CreateSphere("Sphere", 16, 3), scene));
-            entity.add(new Transform3d());
-            engine.addEntity(entity);
-        }
 
         generateMap();
     }
@@ -121,7 +115,7 @@ class Game extends Application {
             g.lineBetween(wall.x1 * s, wall.y1 * s, wall.x2 * s, wall.y2 * s);
         }
 
-        e.get(Transform).scale.setTo(0.5, 0.5);
+        e.get(Transform).scale.setTo(0.25, 0.25);
     }
 
     static function main():Void {
