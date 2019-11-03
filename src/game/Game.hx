@@ -43,10 +43,6 @@ class Game extends Application {
         new JQuery(".gen").click(function(e) {
             generateMap();
         });
-        new JQuery(".step").click(function(e) {
-            mapGen.step(currentMap);
-            drawMap(currentMap);
-        });
     }
 
     public function generateMap() {
@@ -75,19 +71,13 @@ class Game extends Application {
                         case Door: {
                             e = Factory.createTile();
                             engine.addEntity(e);
-                            e.get(Sprite).tint = 0xff0000;
-                        }
-
-                        case Corridor: {
-                            e = Factory.createTile();
-                            engine.addEntity(e);
-                            e.get(Sprite).tint = 0xffffaa;
+                            e.get(Sprite).tint = 0xffaaaa;
                         }
 
                         case Room: {
                             e = Factory.createTile();
                             engine.addEntity(e);
-                            e.get(Sprite).tint = 0xaaaaff;
+                            e.get(Sprite).tint = 0xffffaa;
                         }
                     }
                 }

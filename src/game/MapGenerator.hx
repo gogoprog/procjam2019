@@ -3,47 +3,58 @@ package game;
 import phaser.geom.Rectangle;
 import whiplash.math.Vector2;
 
-enum Tile {
+enum ZoneType {
     First;
     Room;
     Door;
-    Corridor;
 }
 
 class Wall extends phaser.geom.Line {
-
     public function new(?a, ?b, ?c, ?d) {
         super(a, b, c, d);
     }
+}
 
+class Zone {
+    public var parent:Zone = null;
+    public var children:Array<Zone> = [];
+    public var type:ZoneType;
+    public var rect:Rectangle;
+
+    public function new() {
+    }
 }
 
 class Map {
-    public var grid:Array<Array<Tile>>;
+    public var grid:Array<Array<ZoneType>>;
     public var width:Int;
     public var height:Int;
     public var rect:Rectangle;
     public var rects:Array<Rectangle>;
     public var walls:Array<Wall>;
+    public var rootZone:Zone = null;
+    public var lastZone:Zone = null;
+    public var allZones:Array<Zone>;
 
     public function new(w, h) {
         this.width = w;
         this.height = h;
         this.rect = new Rectangle(0, 0, w, h);
-        grid = new Array<Array<Tile>>();
+        grid = new Array<Array<ZoneType>>();
 
         for(y in 0...height) {
-            grid[y] = new Array<Tile>();
+            grid[y] = new Array<ZoneType>();
         }
 
         rects = [];
+        allZones = [];
     }
 
-    public inline function setTile(x:Int, y:Int, t:Tile) {
+    public inline function setTile(x:Int, y:Int, t:ZoneType) {
         grid[y][x] = t;
     }
 
-    public inline function getTile(x:Int, y:Int):Tile {
+    public inline function getTile(x:Int, y:Int):ZoneType {
         if(grid[y] != null) {
             var v = grid[y][x];
             return v;
@@ -52,7 +63,7 @@ class Map {
         return null;
     }
 
-    public function addRect(rect:Rectangle, t:Tile) {
+    public function addZone(parent:Zone, rect:Rectangle, t:ZoneType) {
         var sx = Std.int(rect.x);
         var sy = Std.int(rect.y);
 
@@ -63,12 +74,29 @@ class Map {
         }
 
         rects.push(rect);
+        {
+            lastZone = new Zone();
+            lastZone.rect = rect;
+            lastZone.parent = parent;
+            lastZone.type = t;
+
+            if(parent == null) {
+                rootZone = lastZone;
+            } else {
+                parent.children.push(lastZone);
+            }
+
+            allZones.push(lastZone);
+        }
     }
 
-    public function getLastRect():Rectangle {
-        return rects[rects.length-1];
+    public function getLastZone():Zone {
+        return lastZone;
     }
 
+    public function getRandomZone():Zone {
+        return allZones[Std.random(allZones.length)];
+    }
 }
 
 class MapGenerator {
@@ -86,15 +114,14 @@ class MapGenerator {
             tryAdd(map, rect, null, First);
         }
 
-        while(step(map)) {
+        while(addRoom(map)) {
         }
 
         for(i in 0...8) {
-            var startRectangle = map.rects[Std.random(map.rects.length)];
-            var started = step(map, startRectangle);
+            var started = addRoom(map, map.getRandomZone());
 
             if(started) {
-                while(step(map)) {
+                while(addRoom(map)) {
                 }
             }
         }
@@ -104,26 +131,26 @@ class MapGenerator {
         return map;
     }
 
-    public function step(map, lastRectangle:Rectangle = null) {
+    public function addRoom(map:Map, parentZone:Zone = null) {
         var r = Std.random(2);
         var rect:Rectangle = null;
         var added = false;
         var count = 0;
 
-        if(lastRectangle == null) {
-            lastRectangle = map.getLastRect();
+        if(parentZone == null) {
+            parentZone = map.getLastZone();
         }
 
         if(r == 0) {
             while(!added && count < 1024) {
-                rect = getRandomRoom(map, lastRectangle);
-                added = tryAdd(map, rect, lastRectangle, Room);
+                rect = getRandomRoom(map, parentZone.rect);
+                added = tryAdd(map, rect, parentZone, Room);
                 ++count;
             }
         } else {
             while(!added && count < 1024) {
-                rect = getRandomCorridor(map, lastRectangle);
-                added = tryAdd(map, rect, lastRectangle, Corridor);
+                rect = getRandomCorridor(map, parentZone.rect);
+                added = tryAdd(map, rect, parentZone, Room);
                 ++count;
             }
         }
@@ -206,10 +233,10 @@ class MapGenerator {
         }
     }
 
-    static private function tryAdd(map, rect, parent, tile:Tile) {
+    static private function tryAdd(map:Map, rect:Rectangle, parent:Zone, tile:ZoneType) {
         if(untyped Phaser.Geom.Rectangle.ContainsRect(map.rect, rect)) {
             if(!isValid(rect, parent, map.rects)) {
-                map.addRect(rect, tile);
+                map.addZone(parent, rect, tile);
                 return true;
             }
         }
@@ -306,9 +333,9 @@ class MapGenerator {
         return false;
     }
 
-    static private function isValid(rect:Rectangle, parent:Rectangle, rects:Array<Rectangle>):Bool {
+    static private function isValid(rect:Rectangle, parent:Zone, rects:Array<Rectangle>):Bool {
         for(other_rect in rects) {
-            if(other_rect != parent) {
+            if(parent == null || other_rect != parent.rect) {
                 if(intersectsOrTouches(rect, other_rect)) {
                     return true;
                 }
