@@ -13,10 +13,12 @@ import whiplash.*;
 import whiplash.math.*;
 import whiplash.phaser.*;
 import whiplash.common.components.Active;
+import whiplash.babylon.components.*;
 
 class Game extends Application {
     private var mapGen:game.map.Generator = new game.map.Generator();
     private var currentMap:game.map.Map;
+    private var scene:BABYLON.Scene;
 
     public function new() {
         super(1024, 600, ".root");
@@ -32,8 +34,35 @@ class Game extends Application {
         game.sound.pauseOnBlur = false;
         AudioManager.init(whiplash.Lib.phaserScene);
 
+        scene = new BABYLON.Scene(whiplash.Lib.babylonEngine);
+        var entity = new Entity();
+        entity.add(new Transform3d());
+        entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
+        entity.add(new Active());
+        entity.get(Transform3d).position = new Vector3(0, 10, -10);
+        entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
+        engine.addEntity(entity);
+        var entity = new Entity();
+        entity.add(new Light(new BABYLON.PointLight("Omni0", BABYLON.Vector3.Zero(), scene), scene));
+        entity.add(new Transform3d());
+        entity.get(Transform3d).position = new BABYLON.Vector3(0, 100, -100);
+        engine.addEntity(entity);
+        {
+            var entity = new Entity();
+            entity.add(new Mesh(BABYLON.Mesh.CreateSphere("Sphere", 16, 3), scene));
+            entity.add(new Transform3d());
+            engine.addEntity(entity);
+        }
 
         generateMap();
+    }
+
+    override function update(time, delta) {
+        super.update(time, delta);
+
+        if(scene != null) {
+            scene.render();
+        }
     }
 
     override function onGuiLoaded():Void {
@@ -46,38 +75,45 @@ class Game extends Application {
 
     public function generateMap() {
         var map  = mapGen.generate();
-        drawMap(map);
+        drawMiniMap(map);
         currentMap = map;
     }
 
-    public function drawMap(map:game.map.Map) {
-        engine.removeAllEntities();
+    public function drawMiniMap(map:game.map.Map) {
         {
-            var e = Factory.createGraphics();
-            engine.addEntity(e);
-            var g = e.get(Graphics);
-            var s = Config.tileSize;
-            var walls:Array<game.map.Wall> = map.walls;
+            var e = engine.getEntityByName("minimap");
 
-            for(zone in map.allZones) {
-                switch(zone.type) {
-                    case First:
-                        g.fillStyle(0xaaffaa, 1);
-
-                    case Room:
-                        g.fillStyle(0xffffaa, 1);
-
-                    case Door:
-                        g.fillStyle(0xffaaaa, 1);
-                }
-
-                g.fillRect(zone.rect.x * s, zone.rect.y * s, zone.rect.width *s, zone.rect.height * s);
-            }
-
-            for(wall in walls) {
-                g.lineBetween(wall.x1 * s, wall.y1 * s, wall.x2 * s, wall.y2 * s);
+            if(e != null) {
+                engine.removeEntity(e);
             }
         }
+        var e = Factory.createGraphics();
+        e.name = "minimap";
+        engine.addEntity(e);
+        var g = e.get(Graphics);
+        var s = Config.tileSize;
+        var walls:Array<game.map.Wall> = map.walls;
+
+        for(zone in map.allZones) {
+            switch(zone.type) {
+                case First:
+                    g.fillStyle(0xaaffaa, 1);
+
+                case Room:
+                    g.fillStyle(0xffffaa, 1);
+
+                case Door:
+                    g.fillStyle(0xffaaaa, 1);
+            }
+
+            g.fillRect(zone.rect.x * s, zone.rect.y * s, zone.rect.width *s, zone.rect.height * s);
+        }
+
+        for(wall in walls) {
+            g.lineBetween(wall.x1 * s, wall.y1 * s, wall.x2 * s, wall.y2 * s);
+        }
+
+        e.get(Transform).scale.setTo(0.5, 0.5);
     }
 
     static function main():Void {

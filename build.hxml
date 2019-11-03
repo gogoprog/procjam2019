@@ -7,6 +7,7 @@
 -js build/generated.js
 -main game.Game
 -D phaser
+-D babylonjs
 -D dataPath=./data
 -D dataRelativePath=../data
 
