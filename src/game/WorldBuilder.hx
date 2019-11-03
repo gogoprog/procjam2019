@@ -24,5 +24,20 @@ class WorldBuilder {
             engine.addEntity(e);
             entities.push(e);
         }
+
+        for(wall in map.walls) {
+            var len = wall.getLength();
+            var e = Factory.createWall(len, 3);
+
+            if(wall.x1 == wall.x2) {
+                e.get(Transform3d).setRotationFromYawPitchRoll(Math.PI / 2, 0, 0);
+                e.get(Transform3d).position.set(offset.x + wall.x1, 0, offset.y + wall.y1 + len * 0.5);
+            } else {
+                e.get(Transform3d).position.set(offset.x + wall.x1 + len * 0.5, 0, offset.y + wall.y1);
+            }
+
+            engine.addEntity(e);
+            entities.push(e);
+        }
     }
 }

@@ -7,6 +7,7 @@ import whiplash.math.*;
 
 class Factory {
     static public var floorMaterial:BABYLON.StandardMaterial;
+    static public var metalMaterial:BABYLON.StandardMaterial;
 
     static public function preload(scene:phaser.Scene) {
     }
@@ -17,6 +18,10 @@ class Factory {
         floorMaterial.diffuseTexture = new BABYLON.Texture("../data/textures/floor.png", scene);
         floorMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         floorMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        metalMaterial = new BABYLON.StandardMaterial("metal", scene);
+        metalMaterial.diffuseTexture = new BABYLON.Texture("../data/textures/metal.png", scene);
+        metalMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        metalMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
     }
 
     static public function createTile() {
@@ -44,6 +49,23 @@ class Factory {
         var m = BABYLON.MeshBuilder.CreateTiledGround("floor", {xmin:0, zmin:0, xmax:w, zmax:h, subdivisions: {w:w, h:h}}, Game.instance.scene);
         e.add(new Mesh(m, Game.instance.scene));
         m.material = floorMaterial;
+        return e;
+    }
+
+    static public function createWall(s, h) {
+        var e = new Entity();
+        e.add(new Transform3d());
+        var uvs = new BABYLON.Vector4(0, 0, s, h);
+        var options = {
+            sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+            width: s,
+            height: h,
+            frontUVs: uvs,
+            backUVs: uvs
+        };
+        var m = BABYLON.MeshBuilder.CreatePlane("wall", options, Game.instance.scene);
+        e.add(new Mesh(m, Game.instance.scene));
+        m.material = metalMaterial;
         return e;
     }
 }
