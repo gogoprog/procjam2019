@@ -16,12 +16,17 @@ import whiplash.common.components.Active;
 import whiplash.babylon.components.*;
 
 class Game extends Application {
+    static public var instance:Game;
+
     private var mapGen:game.map.Generator = new game.map.Generator();
+    private var worldBuilder:game.WorldBuilder;
     private var currentMap:game.map.Map;
-    private var scene:BABYLON.Scene;
+
+    public var scene:BABYLON.Scene;
 
     public function new() {
         super(1024, 600, ".root");
+        instance = this;
     }
 
     override function preload():Void {
@@ -34,12 +39,14 @@ class Game extends Application {
         game.sound.pauseOnBlur = false;
         AudioManager.init(whiplash.Lib.phaserScene);
 
+        worldBuilder = new game.WorldBuilder(whiplash.Lib.ashEngine);
         scene = new BABYLON.Scene(whiplash.Lib.babylonEngine);
+        Factory.init();
         var entity = new Entity();
         entity.add(new Transform3d());
         entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
         entity.add(new Active());
-        entity.get(Transform3d).position = new Vector3(0, 10, -10);
+        entity.get(Transform3d).position = new Vector3(0, 100, -100);
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
         engine.addEntity(entity);
         var entity = new Entity();
@@ -77,6 +84,7 @@ class Game extends Application {
         var map  = mapGen.generate();
         drawMiniMap(map);
         currentMap = map;
+        worldBuilder.build(map);
     }
 
     public function drawMiniMap(map:game.map.Map) {
