@@ -13,11 +13,10 @@ import whiplash.*;
 import whiplash.math.*;
 import whiplash.phaser.*;
 import whiplash.common.components.Active;
-import game.MapGenerator;
 
 class Game extends Application {
-    private var mapGen:MapGenerator = new MapGenerator();
-    private var currentMap:Map;
+    private var mapGen:game.map.Generator = new game.map.Generator();
+    private var currentMap:game.map.Map;
 
     public function new() {
         super(1024, 600, ".root");
@@ -51,7 +50,7 @@ class Game extends Application {
         currentMap = map;
     }
 
-    public function drawMap(map) {
+    public function drawMap(map:game.map.Map) {
         engine.removeAllEntities();
         var offset = Config.gridOffset;
 
@@ -92,7 +91,7 @@ class Game extends Application {
             var e = Factory.createGraphics();
             engine.addEntity(e);
             var g = e.get(Graphics);
-            var walls:Array<Wall> = map.walls;
+            var walls:Array<game.map.Wall> = map.walls;
 
             for(wall in walls) {
                 g.lineBetween(wall.x1 * Config.tileSize, wall.y1 * Config.tileSize, wall.x2 * Config.tileSize, wall.y2 * Config.tileSize);
