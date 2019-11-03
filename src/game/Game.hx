@@ -41,11 +41,13 @@ class Game extends Application {
 
         worldBuilder = new game.WorldBuilder(whiplash.Lib.ashEngine);
         scene = new BABYLON.Scene(whiplash.Lib.babylonEngine);
+        scene.clearColor = new BABYLON.Color4(0.5, 0.5, 0.6, 1);
         Factory.init();
         var entity = new Entity();
         entity.add(new Transform3d());
         entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
         entity.add(new Active());
+        entity.add(new ArcCamControl());
         entity.get(Transform3d).position = new Vector3(0, 50, -90);
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
         engine.addEntity(entity);
@@ -56,6 +58,8 @@ class Game extends Application {
         engine.addEntity(entity);
 
         generateMap();
+
+        engine.addSystem(new ArcCamControlSystem(), 1);
     }
 
     override function update(time, delta) {
