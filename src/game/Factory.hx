@@ -41,7 +41,7 @@ class Factory {
     static public function createFloor(w, h) {
         var e = new Entity();
         e.add(new Transform3d());
-        var m = BABYLON.MeshBuilder.CreateGround("plane", {width:w, height:h }, Game.instance.scene);
+        var m = BABYLON.MeshBuilder.CreateTiledGround("floor", {xmin:0, zmin:0, xmax:w, zmax:h, subdivisions: {w:w, h:h}}, Game.instance.scene);
         e.add(new Mesh(m, Game.instance.scene));
         m.material = floorMaterial;
         return e;

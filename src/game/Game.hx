@@ -46,7 +46,7 @@ class Game extends Application {
         entity.add(new Transform3d());
         entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
         entity.add(new Active());
-        entity.get(Transform3d).position = new Vector3(0, 100, -100);
+        entity.get(Transform3d).position = new Vector3(0, 50, -90);
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
         engine.addEntity(entity);
         var entity = new Entity();
@@ -108,11 +108,12 @@ class Game extends Application {
                     g.fillStyle(0xffaaaa, 1);
             }
 
-            g.fillRect(zone.rect.x * s, zone.rect.y * s, zone.rect.width *s, zone.rect.height * s);
+            var y = (map.height - zone.rect.y - zone.rect.height) * s;
+            g.fillRect(zone.rect.x * s, y, zone.rect.width * s, zone.rect.height * s);
         }
 
         for(wall in walls) {
-            g.lineBetween(wall.x1 * s, wall.y1 * s, wall.x2 * s, wall.y2 * s);
+            g.lineBetween(wall.x1 * s, (map.height - wall.y1) * s, wall.x2 * s, (map.height - wall.y2) * s);
         }
 
         e.get(Transform).scale.setTo(0.25, 0.25);

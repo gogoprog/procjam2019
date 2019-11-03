@@ -20,7 +20,7 @@ class WorldBuilder {
 
         for(zone in map.allZones) {
             var e = Factory.createFloor(zone.rect.width, zone.rect.height);
-            e.get(Transform3d).position.set(offset.x + zone.rect.x + zone.rect.width / 2, 0, offset.y + zone.rect.y + zone.rect.height / 2);
+            e.get(Transform3d).position.set(offset.x + zone.rect.x, 0, offset.y + zone.rect.y);
             engine.addEntity(e);
             entities.push(e);
         }
