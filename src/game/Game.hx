@@ -52,9 +52,9 @@ class Game extends Application {
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
         engine.addEntity(entity);
         var entity = new Entity();
-        entity.add(new Light(new BABYLON.PointLight("Omni0", BABYLON.Vector3.Zero(), scene), scene));
+        var dl = new BABYLON.DirectionalLight("Dir0", new Vector3(-0.1, -2, -1), scene);
+        entity.add(new Light(dl, scene));
         entity.add(new Transform3d());
-        entity.get(Transform3d).position = new BABYLON.Vector3(0, 100, -100);
         engine.addEntity(entity);
 
         generateMap();

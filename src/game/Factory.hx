@@ -16,12 +16,16 @@ class Factory {
         var scene = Game.instance.scene;
         floorMaterial = new BABYLON.StandardMaterial("floor", scene);
         floorMaterial.diffuseTexture = new BABYLON.Texture("../data/textures/floor.png", scene);
+        floorMaterial.bumpTexture = new BABYLON.Texture("../data/textures/floor_n.png", scene);
         floorMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         floorMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        floorMaterial.maxSimultaneousLights = 10;
         metalMaterial = new BABYLON.StandardMaterial("metal", scene);
-        metalMaterial.diffuseTexture = new BABYLON.Texture("../data/textures/metal.png", scene);
+        metalMaterial.diffuseTexture = new BABYLON.Texture("../data/textures/wall.png", scene);
+        metalMaterial.bumpTexture = new BABYLON.Texture("../data/textures/wall_n.png", scene);
         metalMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         metalMaterial.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        metalMaterial.maxSimultaneousLights = 10;
     }
 
     static public function createTile() {
@@ -66,6 +70,15 @@ class Factory {
         var m = BABYLON.MeshBuilder.CreatePlane("wall", options, Game.instance.scene);
         e.add(new Mesh(m, Game.instance.scene));
         m.material = metalMaterial;
+        return e;
+    }
+
+    static public function createLight() {
+        var scene = Game.instance.scene;
+        var e = new Entity();
+        e.add(new Transform3d());
+        e.add(new Light(new BABYLON.PointLight("light", BABYLON.Vector3.Zero(), scene), scene));
+        e.get(Light).o.diffuse = new BABYLON.Color3(1, 0, 0);
         return e;
     }
 }

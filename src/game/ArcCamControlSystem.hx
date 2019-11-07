@@ -36,11 +36,11 @@ class ArcCamControlSystem extends ListIteratingSystem<ArcCamControlNode> {
 
         var direction = new Vector2(s, -c);
 
-        node.transform.position.set(direction.x * distance, 50, direction.y * distance);
+        node.transform.position.set(direction.x * distance, node.control.height, direction.y * distance);
 
         node.transform.lookAt(Vector3.zero);
 
-        angle += dt;
+        angle += dt / 5;
     }
 
     private function onNodeAdded(node:ArcCamControlNode) {
