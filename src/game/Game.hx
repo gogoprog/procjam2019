@@ -79,6 +79,7 @@ class Game extends Application {
         entity.add(new Active());
         entity.get(Transform3d).position = new Vector3(0, 50, -90);
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
+        entity.get(Camera).o.minZ = 0.1;
         engine.addEntity(entity);
         var entity = new Entity();
         entity.name = "directionalLight";
