@@ -14,7 +14,7 @@
 
 ## Info
 
-Made with (whiplash)[https://github.com/firefalcom/whiplash]
+Made with [whiplash](https://github.com/firefalcom/whiplash) in Haxe
 
 External assets:
 
