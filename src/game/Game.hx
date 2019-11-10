@@ -43,23 +43,12 @@ class Game extends Application {
         scene = new BABYLON.Scene(whiplash.Lib.babylonEngine);
         scene.clearColor = new BABYLON.Color4(0.5, 0.5, 0.6, 1);
         Factory.init();
-        var entity = new Entity();
-        entity.add(new Transform3d());
-        entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
-        entity.add(new Active());
-        entity.add(new ArcCamControl());
-        entity.get(Transform3d).position = new Vector3(0, 50, -90);
-        entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
-        engine.addEntity(entity);
-        var entity = new Entity();
-        var dl = new BABYLON.DirectionalLight("Dir0", new Vector3(-0.1, -2, -1), scene);
-        entity.add(new Light(dl, scene));
-        entity.add(new Transform3d());
-        engine.addEntity(entity);
 
+        setupScene();
+        setupStates();
+
+        gotoMainMenu();
         generateMap();
-
-        engine.addSystem(new ArcCamControlSystem(), 1);
     }
 
     override function update(time, delta) {
@@ -76,6 +65,38 @@ class Game extends Application {
         new JQuery(".gen").click(function(e) {
             generateMap();
         });
+
+        new JQuery(".play").click(function(e) {
+            gotoInGame();
+        });
+    }
+
+    private function setupScene() {
+        var entity = new Entity();
+        entity.name = "camera";
+        entity.add(new Transform3d());
+        entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
+        entity.add(new Active());
+        entity.add(new ArcCamControl());
+        entity.get(Transform3d).position = new Vector3(0, 50, -90);
+        entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
+        engine.addEntity(entity);
+        var entity = new Entity();
+        entity.name = "directionalLight";
+        var dl = new BABYLON.DirectionalLight("Dir0", new Vector3(-0.1, -2, -1), scene);
+        dl.intensity = 0.5;
+        entity.add(new Light(dl, scene));
+        entity.add(new Transform3d());
+        engine.addEntity(entity);
+    }
+
+    private function setupStates() {
+        createUiState("menu", ".menu");
+        createUiState("hud", ".hud");
+        var menuState = createState("menu");
+        menuState.addInstance(new ArcCamControlSystem());
+        var ingameState = createState("ingame");
+        // ingameState.addInstance(new WorldSystem()).withPriority(2);
     }
 
     public function generateMap() {
@@ -121,6 +142,20 @@ class Game extends Application {
         }
 
         e.get(Transform).scale.setTo(0.25, 0.25);
+    }
+
+    public function gotoMainMenu() {
+        engine.updateComplete.addOnce(function() {
+            changeState("menu");
+            changeUiState("menu");
+        });
+    }
+
+    public function gotoInGame() {
+        engine.updateComplete.addOnce(function() {
+            changeState("ingame");
+            changeUiState("hud");
+        });
     }
 
     static function main():Void {

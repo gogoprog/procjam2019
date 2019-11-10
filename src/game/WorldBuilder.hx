@@ -48,5 +48,12 @@ class WorldBuilder {
             engine.addEntity(e);
             entities.push(e);
         }
+
+        {
+            var startZone = map.allZones[0];
+            var e = Factory.createPlayer();
+            e.get(Transform3d).position.set(offset.x + startZone.rect.centerX, 0, offset.y + startZone.rect.centerY);
+            engine.addEntity(e);
+        }
     }
 }

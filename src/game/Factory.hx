@@ -81,4 +81,13 @@ class Factory {
         e.get(Light).o.diffuse = new BABYLON.Color3(1, 0, 0);
         return e;
     }
+
+    static public function createPlayer() {
+        var scene = Game.instance.scene;
+        var e = new Entity();
+        e.add(new Transform3d());
+        var m = BABYLON.MeshBuilder.CreateSphere("-", {diameter:1, segments:16}, scene);
+        e.add(new Mesh(m, Game.instance.scene));
+        return e;
+    }
 }
