@@ -3,10 +3,12 @@ package game;
 import ash.tools.ListIteratingSystem;
 import ash.core.*;
 import whiplash.babylon.components.*;
+import whiplash.math.*;
 
 class PlayerNode extends Node<PlayerNode> {
     public var transform:Transform3d;
     public var player:Player;
+    public var mesh:Mesh;
 }
 
 class PlayerSystem extends ListIteratingSystem<PlayerNode> {
@@ -23,6 +25,7 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
         this.engine = engine;
         camera = engine.getEntityByName("camera");
         cameraTransform = camera.get(Transform3d);
+        lockPointer();
     }
 
     public override function removeFromEngine(engine:Engine) {
@@ -31,9 +34,10 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
 
     private function updateNode(node:PlayerNode, dt:Float):Void {
         var t = node.transform;
+        var player = node.player;
 
         {
-            var d = node.player.direction;
+            var d = player.direction;
             var keys = whiplash.Input.keys;
 
             d.set(0, 0, 0);
@@ -57,12 +61,29 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
             d.normalize();
 
             if(d.getLength() > 0) {
-                t.position += d * 5 * dt;
+                var forward = node.mesh.o.forward;
+                var localMat = untyped node.mesh.o._localWorld;
+                // t.position += forward * d * 5 * dt;
+                var nd = d * 5 * dt;
+
+                t.position += Vector3.TransformNormal(nd, localMat);
             }
+        }
+        {
+            var move = whiplash.Input.mouseMove;
+            player.pitch += move.y * 0.01;
+            player.yaw += move.x * 0.01;
+
+            t.setRotationFromYawPitchRoll(player.yaw, player.pitch, 0);
+
         }
         {
             cameraTransform.position.set(t.position.x, t.position.y + 0.5, t.position.z);
             cameraTransform.rotation.copyFrom(t.rotation);
+        }
+
+        if(whiplash.Input.mouseButtons[0]) {
+            lockPointer();
         }
     }
 
@@ -70,6 +91,10 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
     }
 
     private function onNodeRemoved(node:PlayerNode) {
+    }
+
+    private function lockPointer() {
+        new js.jquery.JQuery("canvas")[0].requestPointerLock();
     }
 }
 
