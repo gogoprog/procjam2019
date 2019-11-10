@@ -22,10 +22,12 @@ class ArcCamControlSystem extends ListIteratingSystem<ArcCamControlNode> {
     public override function addToEngine(engine:Engine) {
         super.addToEngine(engine);
         this.engine = engine;
+        engine.getEntityByName("camera").add(new ArcCamControl());
     }
 
     public override function removeFromEngine(engine:Engine) {
         super.removeFromEngine(engine);
+        engine.getEntityByName("camera").remove(ArcCamControl);
     }
 
     private function updateNode(node:ArcCamControlNode, dt:Float):Void {

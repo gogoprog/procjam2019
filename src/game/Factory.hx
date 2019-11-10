@@ -85,9 +85,11 @@ class Factory {
     static public function createPlayer() {
         var scene = Game.instance.scene;
         var e = new Entity();
+        e.name = "player";
         e.add(new Transform3d());
         var m = BABYLON.MeshBuilder.CreateSphere("-", {diameter:1, segments:16}, scene);
         e.add(new Mesh(m, Game.instance.scene));
+        e.add(new Player());
         return e;
     }
 }

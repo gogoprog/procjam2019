@@ -77,7 +77,6 @@ class Game extends Application {
         entity.add(new Transform3d());
         entity.add(new Camera(new BABYLON.FreeCamera("Camera", BABYLON.Vector3.Zero(), scene), scene));
         entity.add(new Active());
-        entity.add(new ArcCamControl());
         entity.get(Transform3d).position = new Vector3(0, 50, -90);
         entity.get(Transform3d).lookAt(new Vector3(0, 0, 0));
         engine.addEntity(entity);
@@ -96,7 +95,7 @@ class Game extends Application {
         var menuState = createState("menu");
         menuState.addInstance(new ArcCamControlSystem());
         var ingameState = createState("ingame");
-        // ingameState.addInstance(new WorldSystem()).withPriority(2);
+        ingameState.addInstance(new PlayerSystem());
     }
 
     public function generateMap() {
