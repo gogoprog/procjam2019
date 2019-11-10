@@ -61,12 +61,11 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
             d.normalize();
 
             if(d.getLength() > 0) {
-                var forward = node.mesh.o.forward;
                 var localMat = untyped node.mesh.o._localWorld;
-                // t.position += forward * d * 5 * dt;
-                var nd = d * 5 * dt;
-
-                t.position += Vector3.TransformNormal(nd, localMat);
+                var worldDir:Vector3 = Vector3.TransformNormal(d, localMat);
+                worldDir.y = 0;
+                worldDir.normalize();
+                t.position += worldDir * 5 * dt;
             }
         }
         {
