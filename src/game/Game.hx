@@ -84,7 +84,7 @@ class Game extends Application {
         var entity = new Entity();
         entity.name = "directionalLight";
         var dl = new BABYLON.DirectionalLight("Dir0", new Vector3(-0.1, -2, -1), scene);
-        dl.intensity = 0.1;
+        dl.intensity = 0.2;
         entity.add(new Light(dl, scene));
         entity.add(new Transform3d());
         engine.addEntity(entity);

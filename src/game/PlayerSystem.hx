@@ -35,10 +35,10 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
     private function updateNode(node:PlayerNode, dt:Float):Void {
         var t = node.transform;
         var player = node.player;
+        var keys = whiplash.Input.keys;
 
         {
             var d = player.direction;
-            var keys = whiplash.Input.keys;
 
             d.set(0, 0, 0);
 
@@ -89,6 +89,10 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
 
         if(whiplash.Input.mouseButtons[0]) {
             lockPointer();
+        }
+
+        if(keys["Escape"]) {
+            Game.instance.gotoMainMenu();
         }
     }
 

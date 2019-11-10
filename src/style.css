@@ -3,6 +3,11 @@
   src: url("../data/ui/DooM.ttf");
 }
 
+html,
+body {
+  overflow: hidden;
+}
+
 .root {
   font-family: "Main";
   position: absolute;
@@ -40,8 +45,15 @@
   left: 0;
 }
 
+.title {
+  position: absolute;
+  right:32px;
+  font-size:32px;
+  color: #aa0000;
+}
+
 .bottom {
-  display: block;
+  display: flex;
   position: absolute;
   width: 100%;
   bottom: 0;
@@ -62,4 +74,15 @@
 .button:hover {
   color: #660000;
   background-color: rgba(255, 255, 255, 0.9);
+}
+
+.crosshair {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
 }
