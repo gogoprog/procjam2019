@@ -20,9 +20,9 @@ class Game extends Application {
 
     private var mapGen:game.map.Generator = new game.map.Generator();
     private var worldBuilder:game.WorldBuilder;
-    private var currentMap:game.map.Map;
 
     public var scene:BABYLON.Scene;
+    public var currentMap:game.map.Map;
 
     public function new() {
         super(1024, 600, ".root");
@@ -84,7 +84,7 @@ class Game extends Application {
         var entity = new Entity();
         entity.name = "directionalLight";
         var dl = new BABYLON.DirectionalLight("Dir0", new Vector3(-0.1, -2, -1), scene);
-        dl.intensity = 0.5;
+        dl.intensity = 0.1;
         entity.add(new Light(dl, scene));
         entity.add(new Transform3d());
         engine.addEntity(entity);

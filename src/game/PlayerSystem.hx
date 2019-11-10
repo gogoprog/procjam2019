@@ -65,7 +65,8 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
                 var worldDir:Vector3 = Vector3.TransformNormal(d, localMat);
                 worldDir.y = 0;
                 worldDir.normalize();
-                t.position += worldDir * 5 * dt;
+                var requestedPosition = t.position + worldDir * 5 * dt;
+                tryMove(node, requestedPosition);
             }
         }
         {
@@ -74,7 +75,6 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
             player.yaw += move.x * 0.01;
 
             t.setRotationFromYawPitchRoll(player.yaw, player.pitch, 0);
-
         }
         {
             cameraTransform.position.set(t.position.x, t.position.y + 0.5, t.position.z);
@@ -94,6 +94,30 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
 
     private function lockPointer() {
         new js.jquery.JQuery("canvas")[0].requestPointerLock();
+    }
+
+    private function tryMove(node:PlayerNode, position:Vector3) {
+        var currentPosition = node.transform.position;
+        var map = Game.instance.currentMap;
+        var walls = map.walls;
+        var offset = new Vector2(map.width, map.height) * -0.5;
+        var playerLine = new phaser.geom.Line(currentPosition.x - offset.x, currentPosition.z - offset.y, position.x - offset.x, position.z - offset.y);
+        var playerCircle = new phaser.geom.Circle(position.x - offset.x, position.z - offset.y, 0.3);
+        var collides = false;
+
+        for(wall in walls) {
+            // var r = untyped Phaser.Geom.Intersects.LineToLine(playerLine, wall);
+            var r = untyped Phaser.Geom.Intersects.LineToCircle(wall, playerCircle);
+
+            if(r) {
+                collides = true;
+                break;
+            }
+        }
+
+        if(!collides) {
+            node.transform.position = position;
+        }
     }
 }
 

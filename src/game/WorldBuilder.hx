@@ -22,8 +22,7 @@ class WorldBuilder {
             {
                 var e = Factory.createFloor(zone.rect.width, zone.rect.height);
                 e.get(Transform3d).position.set(offset.x + zone.rect.x, 0, offset.y + zone.rect.y);
-                engine.addEntity(e);
-                entities.push(e);
+                spawnEntity(e);
             }
             {
                 // var e = Factory.createLight();
@@ -45,15 +44,19 @@ class WorldBuilder {
                 e.get(Transform3d).position.set(offset.x + wall.x1 + len * 0.5, h/2, offset.y + wall.y1);
             }
 
-            engine.addEntity(e);
-            entities.push(e);
+            spawnEntity(e);
         }
 
         {
             var startZone = map.allZones[0];
             var e = Factory.createPlayer();
             e.get(Transform3d).position.set(offset.x + startZone.rect.centerX, 0, offset.y + startZone.rect.centerY);
-            engine.addEntity(e);
+            spawnEntity(e);
         }
+    }
+
+    public function spawnEntity(e:ash.core.Entity) {
+        engine.addEntity(e);
+        entities.push(e);
     }
 }

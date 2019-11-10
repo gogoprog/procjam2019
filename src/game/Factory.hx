@@ -90,6 +90,11 @@ class Factory {
         var m = BABYLON.MeshBuilder.CreateSphere("-", {diameter:1, segments:16}, scene);
         e.add(new Mesh(m, Game.instance.scene));
         e.add(new Player());
+        var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+        light.diffuse = new BABYLON.Color3(1, 1, 1);
+        light.specular = new BABYLON.Color3(1, 1, 1);
+        light.range = 5;
+        e.add(new Light(light, scene));
         return e;
     }
 }
