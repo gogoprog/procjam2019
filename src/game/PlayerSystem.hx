@@ -26,10 +26,13 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
         camera = engine.getEntityByName("camera");
         cameraTransform = camera.get(Transform3d);
         lockPointer();
+
+        new js.jquery.JQuery(".root").on("click", lockPointer);
     }
 
     public override function removeFromEngine(engine:Engine) {
         super.removeFromEngine(engine);
+        new js.jquery.JQuery(".root").off("click", lockPointer);
     }
 
     private function updateNode(node:PlayerNode, dt:Float):Void {
@@ -87,10 +90,6 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
             cameraTransform.rotation.copyFrom(t.rotation);
         }
 
-        if(whiplash.Input.mouseButtons[0]) {
-            lockPointer();
-        }
-
         if(keys["Escape"]) {
             Game.instance.gotoMainMenu();
         }
@@ -102,7 +101,7 @@ class PlayerSystem extends ListIteratingSystem<PlayerNode> {
     private function onNodeRemoved(node:PlayerNode) {
     }
 
-    private function lockPointer() {
+    private function lockPointer(?e) {
         new js.jquery.JQuery("canvas")[0].requestPointerLock();
     }
 

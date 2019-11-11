@@ -67,6 +67,7 @@ class Game extends Application {
         });
 
         new JQuery(".play").click(function(e) {
+            new js.jquery.JQuery("canvas")[0].requestPointerLock();
             gotoInGame();
         });
     }
